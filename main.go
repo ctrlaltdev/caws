@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/resourcegroupstaggingapi"
 	"github.com/olekukonko/tablewriter"
@@ -133,16 +132,16 @@ func main() {
 
 	var resources []*SingleResource
 
+	if *profile != "" {
+		os.Setenv("AWS_PROFILE", *profile)
+	}
+
 	for _, region := range TraceableRegions {
 
 		// We need to create a new CFG for each region. We
 		// could actually update the region after the fact
 		// but let's focus on the purpose, here :)
 		cfg := aws.Config{Region: aws.String(region)}
-
-		if *profile != "" {
-			cfg.Credentials = credentials.NewSharedCredentials("", *profile)
-		}
 
 		s := session.Must(session.NewSessionWithOptions(session.Options{
 			SharedConfigState: session.SharedConfigEnable,
